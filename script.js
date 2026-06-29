@@ -1,5 +1,5 @@
 const CHANNEL_ID = '3321343';
-const READ_API_KEY = ''; // Deixe vazio se o canal for público
+const READ_API_KEY = 'JGGPU0EI1KMXVQDJ'; // Deixe vazio se o canal for público
 
 // ATENÇÃO: Mudamos para pedir os últimos 20 resultados para alimentar o gráfico histórico
 let url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=20`;
