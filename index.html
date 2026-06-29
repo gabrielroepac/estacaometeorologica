@@ -8,23 +8,28 @@
 </head>
 <body>
 
-    <div class="dashboard">
-        <h1>Dashboard Canal 3321343</h1>
-        
-        <div class="grid-campos">
-            <div class="campo-box">
-                <div class="campo-titulo">Campo 1</div>
-                <div class="dado-container" id="valor-field1">--</div>
+    <div class="dashboard-container">
+        <h1>Monitoramento Canal 3321343</h1>
+
+        <div class="grid-valores">
+            <div class="card-valor">
+                <div class="card-titulo">Último Campo 1</div>
+                <div id="txt-field1" class="valor-principal cor-campo1">--</div>
             </div>
-            
-            <div class="campo-box">
-                <div class="campo-titulo">Campo 2</div>
-                <div class="dado-container" id="valor-field2">--</div>
+            <div class="card-valor">
+                <div class="card-titulo">Último Campo 2</div>
+                <div id="txt-field2" class="valor-principal cor-campo2">--</div>
             </div>
         </div>
-        
-        <div class="timestamp">Última atualização: <span id="tempo-atualizacao">--</span></div>
-        <div class="status" id="status-conexao">Conectando ao ThingSpeak...</div>
+
+        <div class="grafico-wrapper">
+            <canvas id="meuGrafico"></canvas>
+        </div>
+
+        <div class="rodape">
+            <div>Atualização automática (15s)</div>
+            <div id="status-conexao">Conectando...</div>
+        </div>
     </div>
 
     <script src="script.js"></script>
