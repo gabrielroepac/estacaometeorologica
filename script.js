@@ -1,63 +1,89 @@
 const CHANNEL_ID = '3321343';
-const READ_API_KEY = 'JGGPU0EI1KMXVQDJ'; // Deixe vazio se o canal for público
+const READ_API_KEY = ''; // Deixe vazio se for público
 
-// ATENÇÃO: Mudamos para pedir os últimos 20 resultados para alimentar o gráfico histórico
 let url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=20`;
 if (READ_API_KEY !== '') {
     url += `&api_key=${READ_API_KEY}`;
 }
 
-// 1. INICIALIZAÇÃO DO GRÁFICO (Chart.js)
-// Criamos o gráfico vazio primeiro para depois apenas injetar dados nele
+// 1. INICIALIZAÇÃO DO GRÁFICO COM DOIS EIXOS Y
 const ctx = document.getElementById('meuGrafico').getContext('2d');
 const meuGrafico = new Chart(ctx, {
-    type: 'line', // Tipo do gráfico: Linha
+    type: 'line',
     data: {
-        labels: [], // Eixo X (Horários) - será preenchido pela API
+        labels: [], 
         datasets: [
             {
-                label: 'Campo 1',
-                data: [], // Dados do Campo 1
-                borderColor: '#3b82f6', // Cor da linha azul
-                backgroundColor: 'rgba(59, 130, 246, 0.1)', // Sombra leve abaixo da linha
-                borderWidth: 3,
-                tension: 0.3, // Deixa a linha levemente curvada/suave em vez de bicos retos
-                pointRadius: 4,
-                pointBackgroundColor: '#3b82f6'
-            },
-            {
-                label: 'Campo 2',
-                data: [], // Dados do Campo 2
-                borderColor: '#10b981', // Cor da linha verde
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                label: 'Temperatura (°C)',
+                data: [],
+                borderColor: '#ff5722',
+                backgroundColor: 'rgba(255, 87, 34, 0.05)',
                 borderWidth: 3,
                 tension: 0.3,
                 pointRadius: 4,
-                pointBackgroundColor: '#10b981'
+                pointBackgroundColor: '#ff5722',
+                yAxisID: 'yTemperatura' // Vincula esta linha ao eixo da esquerda
+            },
+            {
+                label: 'Umidade (%)',
+                data: [],
+                borderColor: '#00bcd4',
+                backgroundColor: 'rgba(0, 188, 212, 0.05)',
+                borderWidth: 3,
+                tension: 0.3,
+                pointRadius: 4,
+                pointBackgroundColor: '#00bcd4',
+                yAxisID: 'yUmidade' // Vincula esta linha ao eixo da direita
             }
         ]
     },
     options: {
         responsive: true,
-        maintainAspectRatio: false, // Permite que o CSS controle a altura
+        maintainAspectRatio: false,
         plugins: {
             legend: {
-                position: 'top', // Posição da legenda das linhas
+                position: 'top',
                 labels: { font: { family: 'Segoe UI', size: 12 } }
             }
         },
         scales: {
             x: {
-                grid: { display: false } // Remove as linhas de grade verticais do fundo para visual limpo
+                grid: { display: false }
             },
-            y: {
-                grid: { color: '#f1f5f9' } // Deixa as linhas horizontais bem discretas
+            // Configuração do Eixo Esquerdo (Temperatura)
+            yTemperatura: {
+                type: 'linear',
+                position: 'left',
+                min: -10,
+                max: 40,
+                title: {
+                    display: true,
+                    text: 'Temperatura (°C)',
+                    color: '#ff5722',
+                    font: { weight: 'bold' }
+                },
+                grid: { color: '#f1f5f9' }
+            },
+            // Configuração do Eixo Direito (Umidade)
+            yUmidade: {
+                type: 'linear',
+                position: 'right',
+                min: 0,
+                max: 100,
+                title: {
+                    display: true,
+                    text: 'Umidade (%)',
+                    color: '#00bcd4',
+                    font: { weight: 'bold' }
+                },
+                // Oculta as linhas de grade deste eixo para não cruzar e bagunçar com as da esquerda
+                grid: { drawOnChartArea: false } 
             }
         }
     }
 });
 
-// 2. FUNÇÃO QUE BUSCA OS DADOS E ATUALIZA O GRÁFICO
+// 2. BUSCA E FORMATAÇÃO DOS DADOS
 async function atualizarDashboard() {
     try {
         const response = await fetch(url);
@@ -67,32 +93,41 @@ async function atualizarDashboard() {
         const feeds = data.feeds;
 
         if (feeds && feeds.length > 0) {
-            // Processa as informações para o Gráfico
-            // Mapeamos os horários transformando em formato legível de hora (Ex: 14:35)
+            // Horários para o eixo X
             const listaHorarios = feeds.map(feed => {
                 const dataHora = new Date(feed.created_at);
                 return dataHora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             });
 
-            // Mapeia os dados das colunas
+            // Coleta os dados brutos para o gráfico
             const dadosCampo1 = feeds.map(feed => feed.field1);
             const dadosCampo2 = feeds.map(feed => feed.field2);
 
-            // Atualiza os dados dentro do objeto do Chart.js
+            // Atualiza o gráfico
             meuGrafico.data.labels = listaHorarios;
             meuGrafico.data.datasets[0].data = dadosCampo1;
             meuGrafico.data.datasets[1].data = dadosCampo2;
-            
-            // Renderiza o gráfico novamente com os novos dados e animação
             meuGrafico.update();
 
-            // Atualiza também os textos dos cards com o valor mais recente (última posição da lista)
+            // Pega o último registro para os cartões superiores
             const ultimoRegistro = feeds[feeds.length - 1];
             
-            document.getElementById('txt-field1').innerText = ultimoRegistro.field1 !== null ? ultimoRegistro.field1 : '--';
-            document.getElementById('txt-field2').innerText = ultimoRegistro.field2 !== null ? ultimoRegistro.field2 : '--';
+            // FORMATAÇÃO COM APENAS 1 CASA DECIMAL (.toFixed(1))
+            if (ultimoRegistro.field1 !== null) {
+                const tempFormatada = Number(ultimoRegistro.field1).toFixed(1);
+                document.getElementById('txt-field1').innerText = `${tempFormatada} °C`;
+            } else {
+                document.getElementById('txt-field1').innerText = '--';
+            }
 
-            // Atualiza o status
+            if (ultimoRegistro.field2 !== null) {
+                const umidFormatada = Number(ultimoRegistro.field2).toFixed(1);
+                document.getElementById('txt-field2').innerText = `${umidFormatada} %`;
+            } else {
+                document.getElementById('txt-field2').innerText = '--';
+            }
+
+            // Atualiza rodapé
             const ultimaAtualizacao = new Date(ultimoRegistro.created_at).toLocaleTimeString('pt-BR');
             document.getElementById('status-conexao').innerHTML = `Online • <span style="color:#64748b">Última: ${ultimaAtualizacao}</span>`;
             document.getElementById('status-conexao').className = 'status-online';
@@ -108,8 +143,5 @@ async function atualizarDashboard() {
     }
 }
 
-// Executa ao carregar a página
 atualizarDashboard();
-
-// Atualiza a cada 15 segundos
 setInterval(atualizarDashboard, 15000);
