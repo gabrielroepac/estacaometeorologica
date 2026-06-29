@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ThingSpeak - Canal 3321343</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="dashboard">
+        <h1>Dashboard Canal 3321343</h1>
+        
+        <div class="grid-campos">
+            <div class="campo-box">
+                <div class="campo-titulo">Campo 1</div>
+                <div class="dado-container" id="valor-field1">--</div>
+            </div>
+            
+            <div class="campo-box">
+                <div class="campo-titulo">Campo 2</div>
+                <div class="dado-container" id="valor-field2">--</div>
+            </div>
+        </div>
+        
+        <div class="timestamp">Última atualização: <span id="tempo-atualizacao">--</span></div>
+        <div class="status" id="status-conexao">Conectando ao ThingSpeak...</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
