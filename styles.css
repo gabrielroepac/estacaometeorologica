@@ -15,7 +15,7 @@ body {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             padding: 30px;
             width: 100%;
-            max-width: 700px; /* Um pouco mais largo para o gráfico respirar */
+            max-width: 750px; /* Um pouco mais largo para acomodar os dois eixos Y */
         }
 
         h1 {
@@ -26,7 +26,6 @@ body {
             text-align: center;
         }
 
-        /* Grid de valores atuais (foco rápido) */
         .grid-valores {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -56,14 +55,13 @@ body {
             font-weight: 700;
         }
 
-        .cor-campo1 { color: #3b82f6; } /* Azul moderno */
-        .cor-campo2 { color: #10b981; } /* Verde esmeralda moderno */
+        .cor-temperatura { color: #ff5722; } /* Laranja para temperatura */
+        .cor-umidade { color: #00bcd4; }     /* Azul/Ciano para umidade */
 
-        /* Container do Gráfico */
         .grafico-wrapper {
             position: relative;
             margin-bottom: 20px;
-            height: 300px; /* Altura controlada do gráfico */
+            height: 320px;
         }
 
         .rodape {
